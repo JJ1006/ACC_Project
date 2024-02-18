@@ -26,7 +26,7 @@ public class ProductService {
 
     public List<Product> searchProductFromAmazon(String itemToSearch){
         String url = "https://www.amazon.ca/";
-        List<Product> amazonPoductsList = webCrawler.getHtmlDocument(url,itemToSearch);
+        List<Product> amazonPoductsList = webCrawler.fetchAllProductsFromAmazon(url,itemToSearch);
         return amazonPoductsList;
     }
 }

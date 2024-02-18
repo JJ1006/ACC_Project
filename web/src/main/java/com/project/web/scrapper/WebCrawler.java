@@ -21,9 +21,9 @@ public class WebCrawler {
     @Value("${webdriver.chrome.driver.path}")
     String webDriverPath;
 
-    public List<Product> getHtmlDocument(String url, String searchedItem){
+    public List<Product> fetchAllProductsFromAmazon(String url, String searchedItem){
         Document document = null;
-        String docString = getUrlForSearchedItem(url,searchedItem);
+        String docString = getHTMLDocForAmazonSearchedItem(url,searchedItem);
         document = Jsoup.parse(docString);
         Elements elements = document.select(".puis-card-container");
 //        System.out.println(elements);
@@ -48,10 +48,12 @@ public class WebCrawler {
         return productList;
     }
 
-    public String getUrlForSearchedItem(String url , String searchedItem){
+    public String getHTMLDocForAmazonSearchedItem(String url , String searchedItem){
         System.setProperty("webdriver.chrome.driver", webDriverPath);
-        ChromeOptions options = new ChromeOptions();
+//        String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36";
+         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
+        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36");
         WebDriver driver = new ChromeDriver(options);
         driver.get(url);
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);

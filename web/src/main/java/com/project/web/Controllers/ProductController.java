@@ -1,6 +1,7 @@
 package com.project.web.Controllers;
 
 import com.project.web.Models.Product;
+import com.project.web.Models.RequestSchema;
 import com.project.web.Service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,8 @@ public class ProductController {
 	}
 
 	@PostMapping("/search")
-	public ResponseEntity<Map<String, List<Product>>> searchProduct(@RequestBody String item){
-		ResponseEntity<Map<String, List<Product>>> allProducts = productService.getAllProducts(item);
+	public ResponseEntity<Map<String, List<Product>>> searchProduct(@RequestBody RequestSchema product){
+		ResponseEntity<Map<String, List<Product>>> allProducts = productService.getAllProducts(product.getProduct());
 		return allProducts;
 	}
 }
