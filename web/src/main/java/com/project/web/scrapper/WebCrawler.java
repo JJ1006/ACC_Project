@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
+//import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,12 +52,44 @@ public class WebCrawler {
         return productList;
     }
 
+    public List<Product> fetchAllProductsFromVisions(String url, String searchedItem){
+        Document document = null;
+        String docString = getHTMLDocForVisionsSearchedItem(url,searchedItem);
+        document = Jsoup.parse(docString);
+        List<Product> productList = new ArrayList<Product>();
+        return productList;
+
+    }
+
+
+    public String getHTMLDocForVisionsSearchedItem(String url , String searchedItem){
+
+        ChromeOptions options = setChromeDrivers();
+        WebDriver driver = new ChromeDriver(options);
+        driver.get(url);
+        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        String doc = driver.getPageSource();
+//        driver.close();
+        return doc;
+    }
+
     public String getHTMLDocForAmazonSearchedItem(String url , String searchedItem){
 
         ChromeOptions options = setChromeDrivers();
         WebDriver driver = new ChromeDriver(options);
         driver.get(url);
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         driver.findElement(By.id("twotabsearchtextbox")).sendKeys(searchedItem);
         driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
         driver.findElement(By.id("nav-search-submit-button")).click();

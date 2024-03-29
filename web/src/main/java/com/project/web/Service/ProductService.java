@@ -20,9 +20,11 @@ public class ProductService {
     public ResponseEntity<Map<String, List<Product>>> getAllProducts(String itemToSearch){
         List<Product> amazonPoductsList = searchProductFromAmazon(itemToSearch);
         List<Product> bestBuyProductsList = searchProductFromBestBuy(itemToSearch);
+          List<Product> visionsProductsList = searchProductsFromVision(itemToSearch);
         Map<String,List<Product>> allProducts = new HashMap<>();
         allProducts.put("amazon",amazonPoductsList);
         allProducts.put("bestbuy",bestBuyProductsList);
+        allProducts.put("visions",visionsProductsList);
         return new ResponseEntity<>(allProducts, HttpStatus.OK);
     }
 
@@ -37,4 +39,12 @@ public class ProductService {
         List<Product> bestBuyProductsList = webCrawler.fetchAllProductsFromBestBuy(url,itemToSearch);
         return bestBuyProductsList;
     }
+
+    public List<Product> searchProductsFromVision(String itemToSearch){
+        String url = "https://www.visions.ca/";
+        List<Product> visionsProductsList = webCrawler.fetchAllProductsFromVisions(url,itemToSearch);
+        return visionsProductsList;
+    }
+
+
 }
