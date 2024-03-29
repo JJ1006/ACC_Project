@@ -20,11 +20,15 @@ import java.util.concurrent.TimeUnit;
 public class WebCrawler {
 
     @Value("${webdriver.chrome.driver.path}")
-    String webDriverPath;
+    String webDriverPath = "C:\\\\Users\\\\admin\\\\Downloads\\\\chromedriver-win64\\\\chromedriver-win64\\\\chromedriver.exe";
 
     @Value("${chrome.user.agent}")
-    String userAgent;
+    String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36";
 
+//    boolean nextPageAvailableFlagForVisions = true;
+
+    ChromeOptions options = setChromeDrivers();
+    WebDriver driver = new ChromeDriver(options);
     public List<Product> fetchAllProductsFromAmazon(String url, String searchedItem){
         Document document = null;
         String docString = getHTMLDocForAmazonSearchedItem(url,searchedItem);
@@ -46,17 +50,44 @@ public class WebCrawler {
             p.setProductUrl(productUrl);
             p.setProductRatingStars(productRatingStars);
             p.setProductRatingCounts(productRatingCounts);
-            p.setProductPrice(productPrice);
+            p.setProductRegularPrice(productPrice);
             productList.add(p);
         }
         return productList;
     }
 
     public List<Product> fetchAllProductsFromVisions(String url, String searchedItem){
-        Document document = null;
-        String docString = getHTMLDocForVisionsSearchedItem(url,searchedItem);
-        document = Jsoup.parse(docString);
         List<Product> productList = new ArrayList<Product>();
+            Document document = null;
+
+            String docString = getHTMLDocForVisionsSearchedItem(url, searchedItem);
+            document = Jsoup.parse(docString);
+
+            Elements elements = document.select(".dvv982c-container-item");
+
+
+            for (Element e : elements) {
+                Product p = new Product();
+                String productName = e.select(".dvv982c-description > a ").text();
+                String productImage = e.select(" .dvv982c-imgbox > a > img").attr("src");
+                String productUrl = url + e.select(".dvv982c-description > a ").attr("href");
+                String productRatingStars = e.select(".pr-snippet-rating-decimal").text();
+                String productRatingCounts = "0";
+                String productSalePrice = e.select(".dvv982c-saleprice").text();
+                String productRegularPrice = e.select(".dvv982c-lineout").text();
+                p.setProductName(productName);
+
+                p.setProductImage(productImage);
+                p.setProductUrl(productUrl);
+                p.setProductRatingStars(productRatingStars);
+                p.setProductRatingCounts(productRatingCounts);
+                p.setProductRegularPrice(productRegularPrice);
+                p.setProductSalePrice(productSalePrice);
+
+
+                productList.add(p);
+            }
+
         return productList;
 
     }
@@ -64,8 +95,7 @@ public class WebCrawler {
 
     public String getHTMLDocForVisionsSearchedItem(String url , String searchedItem){
 
-        ChromeOptions options = setChromeDrivers();
-        WebDriver driver = new ChromeDriver(options);
+
         driver.get(url);
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         try {
@@ -73,7 +103,20 @@ public class WebCrawler {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        try {
+            driver.findElement(By.id("searchbar-keyword")).sendKeys(searchedItem);
+            driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+            driver.findElement(By.id("searchbar-magbtn")).click();
+            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+//            if(!driver.findElements(By.id("ContentPlaceHolder1_ctrlResultBarPagerUC2_lnkNextpage")).isEmpty()){
+//                nextPageAvailableFlagForVisions = true;
+//            }else{
+//                nextPageAvailableFlagForVisions = false;
+//            }
 
+        }catch (NoSuchElementException e){
+            System.out.println("No element found");
+        }
         String doc = driver.getPageSource();
 //        driver.close();
         return doc;
@@ -81,8 +124,7 @@ public class WebCrawler {
 
     public String getHTMLDocForAmazonSearchedItem(String url , String searchedItem){
 
-        ChromeOptions options = setChromeDrivers();
-        WebDriver driver = new ChromeDriver(options);
+
         driver.get(url);
         driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         try {
@@ -90,10 +132,14 @@ public class WebCrawler {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        driver.findElement(By.id("twotabsearchtextbox")).sendKeys(searchedItem);
-        driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-        driver.findElement(By.id("nav-search-submit-button")).click();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        try {
+            driver.findElement(By.id("twotabsearchtextbox")).sendKeys(searchedItem);
+            driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+            driver.findElement(By.id("nav-search-submit-button")).click();
+            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        }catch (NoSuchElementException e){
+            System.out.println("No element found");
+        }
         String doc = driver.getPageSource();
 //        driver.close();
         return doc;
@@ -137,15 +183,14 @@ public class WebCrawler {
             p.setProductUrl(productUrl);
             p.setProductRatingStars(productRatingStars.toString());
             p.setProductRatingCounts(productRatingCounts);
-            p.setProductPrice(productPrice);
+            p.setProductRegularPrice(productPrice);
             productList.add(p);
         }
         return productList;
     }
 
     public String getHTMLDocForBestBuySearchedItem(String url, String searchedItem){
-        ChromeOptions options = setChromeDrivers();
-        WebDriver driver = new ChromeDriver(options);
+
         String updatedSearchedItem =searchedItem.replaceAll("\\s","+");
         String newUrl = url + "/search?search="+ updatedSearchedItem;
         driver.get(newUrl);

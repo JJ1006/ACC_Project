@@ -1,7 +1,5 @@
 package com.project.web.Models;
 
-import java.sql.Blob;
-
 public class Product {
 
     String productName;
@@ -9,7 +7,17 @@ public class Product {
     String productImage;
     String productUrl;
 
-    String productPrice;
+    String productRegularPrice;
+
+    public String getProductSalePrice() {
+        return productSalePrice;
+    }
+
+    public void setProductSalePrice(String productSalePrice) {
+        this.productSalePrice = productSalePrice;
+    }
+
+    String productSalePrice;
     String productRatingStars;
     String productRatingCounts;
 
@@ -37,12 +45,12 @@ public class Product {
         this.productUrl = productUrl;
     }
 
-    public String getProductPrice() {
-        return productPrice;
+    public String getProductRegularPrice() {
+        return productRegularPrice;
     }
 
-    public void setProductPrice(String productPrice) {
-        this.productPrice = productPrice;
+    public void setProductRegularPrice(String productRegularPrice) {
+        this.productRegularPrice = productRegularPrice;
     }
 
     public String getProductRatingStars() {
