@@ -1,6 +1,7 @@
 package com.project.web.scrapper;
 
 import com.project.web.Models.Product;
+import com.project.web.Service.WordFrequencyCounter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -15,12 +16,12 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class WebCrawler {
+
 
     @Value("${webdriver.chrome.driver.path}")
     String webDriverPath = "C:\\\\Users\\\\admin\\\\Downloads\\\\chromedriver-win64\\\\chromedriver-win64\\\\chromedriver.exe";
@@ -30,6 +31,8 @@ public class WebCrawler {
 
     @Value("${resources.path}")
     String resourcesPath;
+
+
 //    boolean nextPageAvailableFlagForVisions = true;
 
     ChromeOptions options = setChromeDrivers();
@@ -125,6 +128,7 @@ public class WebCrawler {
         String doc = driver.getPageSource();
 //        driver.close();
         createHTMLFile("visions",searchedItem,doc);
+        calculateWordFrequencyForUrl("visions",searchedItem,doc);
         return doc;
     }
 
@@ -149,6 +153,7 @@ public class WebCrawler {
         String doc = driver.getPageSource();
 //        driver.close();
         createHTMLFile("amazon",searchedItem,doc);
+        calculateWordFrequencyForUrl("amazon",searchedItem,doc);
         return doc;
     }
 
@@ -225,6 +230,7 @@ public class WebCrawler {
 
         String doc = driver.getPageSource();
         createHTMLFile("bestbuy",searchedItem,doc);
+        calculateWordFrequencyForUrl("bestbuy",searchedItem,doc);
 
         return doc;
     }
@@ -244,6 +250,20 @@ public class WebCrawler {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
+    }
+
+
+    public void calculateWordFrequencyForUrl(String origin, String searchedItem, String htmlContent) {
+        Document doc = Jsoup.parse(htmlContent);
+        String text = doc.text(); // Extracts text from HTML
+
+        System.out.println("==============================================================");
+        System.out.println("||                                                          ||");
+        System.out.println("     Calculating frequency of words in "+searchedItem+"_"+origin);
+        System.out.println("||                                                          ||");
+        System.out.println("==============================================================");
+        WordFrequencyCounter.calculateFrequency(text,3);
+
     }
 
 }
