@@ -12,6 +12,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +28,8 @@ public class WebCrawler {
     @Value("${chrome.user.agent}")
     String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36";
 
+    @Value("${resources.path}")
+    String resourcesPath;
 //    boolean nextPageAvailableFlagForVisions = true;
 
     ChromeOptions options = setChromeDrivers();
@@ -228,12 +231,12 @@ public class WebCrawler {
 
     private void createHTMLFile(String origin, String searchedItem, String doc){
         try {
-            String dirName = "C:\\Users\\admin\\Desktop\\git\\ACC_Project\\web\\src\\main\\resources\\HTML templates\\"+origin;
+            String dirName = resourcesPath +"\\"+origin;
 
             String fileName = searchedItem+"_"+origin+".html";
             File dir = new File (dirName);
             File actualFile = new File (dir, fileName);
-            FileWriter myWriter = new FileWriter(actualFile);
+            FileWriter myWriter = new FileWriter(actualFile, StandardCharsets.UTF_8);
             myWriter.write(doc);
             myWriter.close();
             System.out.println("Successfully wrote to the file.");
