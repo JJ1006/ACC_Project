@@ -3,6 +3,7 @@ package com.project.web.Service;
 import com.project.web.Models.Product;
 import com.project.web.scrapper.WebCrawler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,14 @@ import java.util.Map;
 @Service
 public class ProductService {
 
+
     @Autowired
     WebCrawler webCrawler;
 
+
+    @Cacheable(cacheNames = "products",key = "#itemToSearch")
     public ResponseEntity<Map<String, List<Product>>> getAllProducts(String itemToSearch){
+        System.out.println("Crawling Started");
         List<Product> amazonPoductsList = searchProductFromAmazon(itemToSearch);
         List<Product> bestBuyProductsList = searchProductFromBestBuy(itemToSearch);
           List<Product> visionsProductsList = searchProductsFromVision(itemToSearch);
@@ -25,6 +30,7 @@ public class ProductService {
         allProducts.put("amazon",amazonPoductsList);
         allProducts.put("bestbuy",bestBuyProductsList);
         allProducts.put("visions",visionsProductsList);
+        System.out.println("Crawling completed");
         return new ResponseEntity<>(allProducts, HttpStatus.OK);
     }
 
