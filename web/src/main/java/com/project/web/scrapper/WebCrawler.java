@@ -11,8 +11,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -119,6 +121,7 @@ public class WebCrawler {
         }
         String doc = driver.getPageSource();
 //        driver.close();
+        createHTMLFile("visions",searchedItem,doc);
         return doc;
     }
 
@@ -142,6 +145,7 @@ public class WebCrawler {
         }
         String doc = driver.getPageSource();
 //        driver.close();
+        createHTMLFile("amazon",searchedItem,doc);
         return doc;
     }
 
@@ -217,8 +221,26 @@ public class WebCrawler {
         }
 
         String doc = driver.getPageSource();
+        createHTMLFile("bestbuy",searchedItem,doc);
 
         return doc;
+    }
+
+    private void createHTMLFile(String origin, String searchedItem, String doc){
+        try {
+            String dirName = "C:\\Users\\admin\\Desktop\\git\\ACC_Project\\web\\src\\main\\resources\\HTML templates\\"+origin;
+
+            String fileName = searchedItem+"_"+origin+".html";
+            File dir = new File (dirName);
+            File actualFile = new File (dir, fileName);
+            FileWriter myWriter = new FileWriter(actualFile);
+            myWriter.write(doc);
+            myWriter.close();
+            System.out.println("Successfully wrote to the file.");
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 
 }
