@@ -53,8 +53,10 @@ public class WordFrequencyCounter {
      */
     public  static int printWordFrequencyAndLexicalRichness(Map<String, Integer> freuencyCounter,String product) {
         System.out.println("Frequency of "+product);
+        int productFrequency =0;
         try{
-            System.out.println(freuencyCounter.get(product));
+            productFrequency = freuencyCounter.get(product.toLowerCase());
+            System.out.println(productFrequency);
         }catch (Exception e){
             System.out.println(product+"not found.");
         }
@@ -70,7 +72,7 @@ public class WordFrequencyCounter {
 
         lexicalRichness = (uniqueWords / totalWords) * 100;
         System.out.println("Lexical richness of the document is: " + lexicalRichness + "%");
-        return freuencyCounter.get(product);
+        return productFrequency;
     }
 
 

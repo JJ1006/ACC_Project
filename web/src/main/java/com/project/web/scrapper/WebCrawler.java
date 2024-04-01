@@ -263,7 +263,7 @@ public class WebCrawler {
         System.out.println("     Calculating frequency of words in "+searchedItem+"_"+origin);
         System.out.println("||                                                          ||");
         System.out.println("==============================================================");
-        int searchedItemFrequency = WordFrequencyCounter.calculateFrequency(text,3,searchedItem);
+        int searchedItemFrequency = WordFrequencyCounter.calculateFrequency(text,2,searchedItem);
         pageRank.put(origin,searchedItemFrequency);
 
     }
