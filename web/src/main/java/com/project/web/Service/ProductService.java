@@ -31,6 +31,7 @@ public class ProductService {
         allProducts.put("bestbuy",bestBuyProductsList);
         allProducts.put("visions",visionsProductsList);
         System.out.println("Crawling completed");
+        webCrawler.pageRanking(itemToSearch);
         return new ResponseEntity<>(allProducts, HttpStatus.OK);
     }
 

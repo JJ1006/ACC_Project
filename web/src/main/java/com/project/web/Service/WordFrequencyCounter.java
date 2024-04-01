@@ -12,7 +12,7 @@ public class WordFrequencyCounter {
         This function is used to calculate word
         frequency.
      */
-    public  static void calculateFrequency(String inputStr, int minStrLength) {
+    public  static int calculateFrequency(String inputStr, int minStrLength,String product) {
         Map<String, Integer> frequencyCounter = new HashMap<>();
 
         // Regex to remove punctuation
@@ -43,19 +43,21 @@ public class WordFrequencyCounter {
                 frequencyCounter.put(token, value + 1);
             }
         }
-        printWordFrequencyAndLexicalRichness(frequencyCounter);
+        int productFrequency = printWordFrequencyAndLexicalRichness(frequencyCounter,product);
+        return productFrequency;
     }
 
     /*
         This function is used to sort word frequency in
         descending order, print the words and calculate lexical richness.
      */
-    public  static void printWordFrequencyAndLexicalRichness(Map<String, Integer> freuencyCounter) {
-        System.out.println("Frequency of Words");
-        freuencyCounter.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .forEach(System.out::println);
-
+    public  static int printWordFrequencyAndLexicalRichness(Map<String, Integer> freuencyCounter,String product) {
+        System.out.println("Frequency of "+product);
+        try{
+            System.out.println(freuencyCounter.get(product));
+        }catch (Exception e){
+            System.out.println(product+"not found.");
+        }
         float totalWords = 0;
         float uniqueWords = 0;
         float lexicalRichness = 0;
@@ -68,6 +70,8 @@ public class WordFrequencyCounter {
 
         lexicalRichness = (uniqueWords / totalWords) * 100;
         System.out.println("Lexical richness of the document is: " + lexicalRichness + "%");
+        return freuencyCounter.get(product);
     }
+
 
 }

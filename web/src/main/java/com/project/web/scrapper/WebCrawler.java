@@ -8,15 +8,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 //import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -37,6 +36,8 @@ public class WebCrawler {
 
     ChromeOptions options = setChromeDrivers();
     WebDriver driver = new ChromeDriver(options);
+
+    Map<String,Integer> pageRank = new TreeMap<>();
     public List<Product> fetchAllProductsFromAmazon(String url, String searchedItem){
         Document document = null;
         String docString = getHTMLDocForAmazonSearchedItem(url,searchedItem);
@@ -262,8 +263,14 @@ public class WebCrawler {
         System.out.println("     Calculating frequency of words in "+searchedItem+"_"+origin);
         System.out.println("||                                                          ||");
         System.out.println("==============================================================");
-        WordFrequencyCounter.calculateFrequency(text,3);
+        int searchedItemFrequency = WordFrequencyCounter.calculateFrequency(text,3,searchedItem);
+        pageRank.put(origin,searchedItemFrequency);
 
     }
 
+    public void pageRanking(String itemToSearch){
+        for(Map.Entry<String,Integer> sortedMap:pageRank.entrySet()){
+            System.out.println(sortedMap.getKey()+" contains "+itemToSearch+" "+sortedMap.getValue()+" times.");
+        }
+    }
 }
