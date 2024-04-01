@@ -22,7 +22,7 @@ public class ProductService {
 
     @Cacheable(cacheNames = "products",key = "#itemToSearch")
     public ResponseEntity<Map<String, List<Product>>> getAllProducts(String itemToSearch){
-        System.out.println("Crawling Started");
+        System.out.println("Crawling for "+ itemToSearch + " started.");
         List<Product> amazonPoductsList = searchProductFromAmazon(itemToSearch);
         List<Product> bestBuyProductsList = searchProductFromBestBuy(itemToSearch);
           List<Product> visionsProductsList = searchProductsFromVision(itemToSearch);
@@ -30,7 +30,7 @@ public class ProductService {
         allProducts.put("amazon",amazonPoductsList);
         allProducts.put("bestbuy",bestBuyProductsList);
         allProducts.put("visions",visionsProductsList);
-        System.out.println("Crawling completed");
+        System.out.println("Crawling for "+ itemToSearch+" completed.");
         webCrawler.pageRanking(itemToSearch);
         return new ResponseEntity<>(allProducts, HttpStatus.OK);
     }

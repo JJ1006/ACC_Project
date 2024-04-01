@@ -58,7 +58,7 @@ public class WordFrequencyCounter {
             productFrequency = freuencyCounter.get(product.toLowerCase());
             System.out.println(productFrequency);
         }catch (Exception e){
-            System.out.println(product+"not found.");
+            System.out.println(product+" not found.");
         }
         float totalWords = 0;
         float uniqueWords = 0;

@@ -40,8 +40,8 @@ public class ProductController {
 	public ResponseEntity<Map<String, List<Product>>> searchProduct(@RequestBody RequestSchema product){
 		invertedIndexing(product.getProduct());
 		calculateWordSearchFrequency(product.getProduct());
-		wordCompletion(product.getProduct());
-		ResponseEntity<Map<String, List<Product>>> allProducts = productService.getAllProducts(product.getProduct());
+		String finalProduct = wordCompletion(product.getProduct());
+		ResponseEntity<Map<String, List<Product>>> allProducts = productService.getAllProducts(finalProduct);
 		System.out.println("HTTP COde:"+allProducts.getStatusCode());
 		return allProducts;
 	}
@@ -88,9 +88,11 @@ public class ProductController {
 		System.out.println(product + " has been searched for "+wordSearched.get(product)+" times previously.");
 	}
 
-	public void wordCompletion(String searchPrefix){
+	public String wordCompletion(String searchPrefix){
 		WordCompletion productTrie = new WordCompletion();
-
+		String finalProduct=searchPrefix;
+		// Prepare to read input from the user
+		Scanner userInputScanner = new Scanner(System.in);
 
 		// Attempt to read product names from the specified file
 		try (BufferedReader productReader = new BufferedReader(new FileReader(filePath))) {
@@ -119,16 +121,25 @@ public class ProductController {
 				System.out.println((i + 1) + ". " + productCompletions.get(i));
 			}
 			// Ask the user to select one of the completions by its index
-//			System.out.println("Enter the number of the product you were looking for: ");
-//			int userChoice = userInputScanner.nextInt();
+			System.out.println("Enter the number of the product you were looking for: ");
+			int userChoice =0 ;
+			try{
+				if(userInputScanner.hasNextInt()) {
+					userChoice = userInputScanner.nextInt();
+				}
+			}catch (Exception e){
+				e.printStackTrace();
+				System.out.println("Exception while reading input!");
+			}
 			// Validate the user's choice and respond accordingly
-//			if (userChoice > 0 && userChoice <= productCompletions.size()) {
-//				// User's choice is valid; print the selected product
-//				System.out.println("You selected: " + productCompletions.get(userChoice - 1));
-//			} else {
-//				// User's choice is invalid; print an error message
-//				System.out.println("Invalid choice. Exiting.");
-//			}
+			if (userChoice > 0 && userChoice <= productCompletions.size()) {
+				// User's choice is valid; print the selected product
+				finalProduct = productCompletions.get(userChoice - 1);
+				System.out.println("You selected: "+finalProduct);
+			} else {
+				// User's choice is invalid; print an error message
+				System.out.println("Invalid choice. Exiting.");
+			}
 		} else {
 			// No completions were found for the provided prefix
 			System.out.println("No completions found for: " + searchPrefix);
@@ -136,6 +147,7 @@ public class ProductController {
 
 		// Close the scanner to prevent resource leaks
 //		userInputScanner.close();
+		return finalProduct;
 	}
 
 
