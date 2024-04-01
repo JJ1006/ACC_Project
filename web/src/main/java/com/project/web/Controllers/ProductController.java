@@ -4,6 +4,7 @@ import com.project.web.Models.Product;
 import com.project.web.Models.RequestSchema;
 import com.project.web.Service.InvertedIndexingWithHTMLParser;
 import com.project.web.Service.ProductService;
+import com.project.web.Service.SpellChecking;
 import com.project.web.Service.WordCompletion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +32,8 @@ public class ProductController {
 
 	Map<String,Integer> wordSearched = new TreeMap<>();
 
+
+
 	@GetMapping("/home")
 	public String getController() {
 		return "Hello world";
@@ -38,9 +41,11 @@ public class ProductController {
 
 	@PostMapping("/search")
 	public ResponseEntity<Map<String, List<Product>>> searchProduct(@RequestBody RequestSchema product){
-		invertedIndexing(product.getProduct());
-		calculateWordSearchFrequency(product.getProduct());
+		String spellChecker = spellChecker(product.getProduct());
 		String finalProduct = wordCompletion(product.getProduct());
+		invertedIndexing(finalProduct);
+		calculateWordSearchFrequency(finalProduct);
+
 		ResponseEntity<Map<String, List<Product>>> allProducts = productService.getAllProducts(finalProduct);
 		System.out.println("HTTP COde:"+allProducts.getStatusCode());
 		return allProducts;
@@ -91,8 +96,7 @@ public class ProductController {
 	public String wordCompletion(String searchPrefix){
 		WordCompletion productTrie = new WordCompletion();
 		String finalProduct=searchPrefix;
-		// Prepare to read input from the user
-		Scanner userInputScanner = new Scanner(System.in);
+
 
 		// Attempt to read product names from the specified file
 		try (BufferedReader productReader = new BufferedReader(new FileReader(filePath))) {
@@ -114,23 +118,14 @@ public class ProductController {
 		List<String> productCompletions = productTrie.findCompletionsForPrefix(searchPrefix);
 
 		// Check if there are any completions for the provided prefix
-		if (!productCompletions.isEmpty()) {
+		if (!productCompletions.isEmpty() && !productCompletions.contains(searchPrefix)) {
+			productCompletions.add(0,"Continue with "+searchPrefix+" .");
 			System.out.println("Completions for \"" + searchPrefix + "\":");
 			// Iterate over the completions and print each one with an index
 			for (int i = 0; i < productCompletions.size(); i++) {
 				System.out.println((i + 1) + ". " + productCompletions.get(i));
 			}
-			// Ask the user to select one of the completions by its index
-			System.out.println("Enter the number of the product you were looking for: ");
-			int userChoice =0 ;
-			try{
-				if(userInputScanner.hasNextInt()) {
-					userChoice = userInputScanner.nextInt();
-				}
-			}catch (Exception e){
-				e.printStackTrace();
-				System.out.println("Exception while reading input!");
-			}
+			int userChoice = readUserInput();
 			// Validate the user's choice and respond accordingly
 			if (userChoice > 0 && userChoice <= productCompletions.size()) {
 				// User's choice is valid; print the selected product
@@ -140,7 +135,10 @@ public class ProductController {
 				// User's choice is invalid; print an error message
 				System.out.println("Invalid choice. Exiting.");
 			}
-		} else {
+		}else if(!productCompletions.isEmpty() && productCompletions.contains(searchPrefix)){
+			System.out.println();
+		}
+		else {
 			// No completions were found for the provided prefix
 			System.out.println("No completions found for: " + searchPrefix);
 		}
@@ -150,6 +148,56 @@ public class ProductController {
 		return finalProduct;
 	}
 
+	public String spellChecker(String itemToSearch){
+		SpellChecking spellChecking = new SpellChecking();
+		String spellCheckerWord=itemToSearch;
+
+		// minimum threshold value
+		int threshold = 2;
+		// Store suggestions in the list
+		List<String> suggestions =spellChecking.suggestCorrections(itemToSearch, threshold);
+
+		// If no suggestions found
+		if (suggestions.isEmpty()) {
+			System.out.println("No corrections found.");
+
+		}
+		if(!suggestions.isEmpty()) {
+			suggestions.add(0,"Continue with "+itemToSearch+" .");
+			System.out.println("Suggested corrections:");
+			for (int i = 0; i < suggestions.size(); i++) {
+				System.out.println((i + 1) + ". " + suggestions.get(i));
+			}
+			int userChoice = readUserInput();
+
+			// Validate the user's choice and respond accordingly
+			if (userChoice > 0 && userChoice <= suggestions.size()) {
+				// User's choice is valid; print the selected product
+				spellCheckerWord = suggestions.get(userChoice - 1);
+				System.out.println("You selected: "+spellCheckerWord);
+			} else {
+				// User's choice is invalid; print an error message
+				System.out.println("Invalid choice. Exiting.");
+			}
+		}
+		return spellCheckerWord;
+	}
 
 
+	public int readUserInput(){
+		// Prepare to read input from the user
+		Scanner userInputScanner = new Scanner(System.in);
+		// Ask the user to select one of the completions by its index
+		System.out.println("Enter the number of the product you were looking for: ");
+		int userChoice =0 ;
+		try{
+			if(userInputScanner.hasNextInt()) {
+				userChoice = userInputScanner.nextInt();
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			System.out.println("Exception while reading input!");
+		}
+		return userChoice;
+	}
 }
