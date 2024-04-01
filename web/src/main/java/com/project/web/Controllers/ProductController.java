@@ -69,19 +69,33 @@ public class ProductController {
 				System.out.println("Processing directory: " + fullPath);
 				indexer.processHTMLFilesFromDirectory(fullPath);
 
-				// Example search
-				String searchTerm = product;
-				Set<String> searchResults = indexer.search(searchTerm);
+				//				// Example search
+//				String searchTerm = product;
 
 
-				System.out.println(subDir+" has "+searchResults.size()+" documents containing "+searchTerm+".");
-				searchResults.clear();
+
+				if (product.contains(" ")){
+					int searchResults = 0;
+					searchResults = indexer.getIndexOfPage(fullPath, product);
+					if (searchResults == -1) {
+						System.out.println("The product was not found in any file.");
+					} else {
+						System.out.println(subDir+" has "+searchResults+" documents containing "+product+".");
+					}
+				}
+				else{
+					Set<String> searchResults = indexer.search(product);
+					System.out.println(subDir+" has "+searchResults.size()+" documents containing "+product+".");
+					searchResults.clear();
+
+				}
 			}
 		} catch(IOException e)
 		{
 			System.out.println("An error occurred while processing the directories.");
 		}
 	}
+
 
 	private void calculateWordSearchFrequency(String product){
 		int count = 0;

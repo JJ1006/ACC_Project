@@ -2,11 +2,12 @@ package com.project.web.Service;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,5 +74,24 @@ public class InvertedIndexingWithHTMLParser{
                         System.err.println("Error reading file: " + filePath);
                     }
                 });
+    }
+    public int getIndexOfPage(String fullPath, String product) {
+
+        int count = 0;
+        try {
+            Path dir = Paths.get(fullPath);
+            DirectoryStream<Path> stream = Files.newDirectoryStream(dir, "*.html");
+            for (Path entry : stream) {
+                String content = new String(Files.readAllBytes(entry));
+                Document doc = Jsoup.parse(content);
+                if (doc.body().text().contains(product)) {
+                    count++;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return count;  // Return the count of files containing the product
+
     }
 }
