@@ -69,7 +69,7 @@ public class ProductController {
 				Set<String> searchResults = indexer.search(searchTerm);
 
 
-				System.out.println(subDir+" has "+searchResults.size()+" documents containg "+searchTerm+".");
+				System.out.println(subDir+" has "+searchResults.size()+" documents containing "+searchTerm+".");
 				searchResults.clear();
 			}
 		} catch(IOException e)

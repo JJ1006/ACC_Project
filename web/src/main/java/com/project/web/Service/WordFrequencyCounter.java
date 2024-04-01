@@ -1,6 +1,12 @@
 package com.project.web.Service;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,7 +18,7 @@ public class WordFrequencyCounter {
         This function is used to calculate word
         frequency.
      */
-    public  static int calculateFrequency(String inputStr, int minStrLength,String product) {
+    public static int calculateFrequency(String origin, String inputStr, int minStrLength, String product) {
         Map<String, Integer> frequencyCounter = new HashMap<>();
 
         // Regex to remove punctuation
@@ -43,7 +49,7 @@ public class WordFrequencyCounter {
                 frequencyCounter.put(token, value + 1);
             }
         }
-        int productFrequency = printWordFrequencyAndLexicalRichness(frequencyCounter,product);
+        int productFrequency = printWordFrequencyAndLexicalRichness(origin,frequencyCounter,product);
         return productFrequency;
     }
 
@@ -51,12 +57,18 @@ public class WordFrequencyCounter {
         This function is used to sort word frequency in
         descending order, print the words and calculate lexical richness.
      */
-    public  static int printWordFrequencyAndLexicalRichness(Map<String, Integer> freuencyCounter,String product) {
+    public static int printWordFrequencyAndLexicalRichness(String origin, Map<String, Integer> freuencyCounter, String product) {
         System.out.println("Frequency of "+product);
         int productFrequency =0;
         try{
-            productFrequency = freuencyCounter.get(product.toLowerCase());
-            System.out.println(productFrequency);
+            if (product.contains(" ")){
+                productFrequency = getFrequencyCount(origin,product);
+                System.out.println(productFrequency);
+            }
+            else {
+                productFrequency = freuencyCounter.get(product.toLowerCase());
+                System.out.println(productFrequency);
+            }
         }catch (Exception e){
             System.out.println(product+" not found.");
         }
@@ -74,6 +86,20 @@ public class WordFrequencyCounter {
         System.out.println("Lexical richness of the document is: " + lexicalRichness + "%");
         return productFrequency;
     }
+    private static int getFrequencyCount(String origin, String product) {
+        int count = 0;
+       String filePath = "C:\\\\Users\\\\admin\\\\Desktop\\\\git\\\\ACC_Project\\\\web\\\\src\\\\main\\\\resources\\\\HTML templates" +"\\"+origin+"\\"+product+"_"+origin+".html";
+        try {
+            String content = new String(Files.readAllBytes(Paths.get(filePath)));
+            Document doc = Jsoup.parse(content);
+            String text = doc.body().text().toLowerCase();
 
+            String[] parts = text.split(product.toLowerCase(), -1);
+            count = parts.length - 1;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
 
 }
