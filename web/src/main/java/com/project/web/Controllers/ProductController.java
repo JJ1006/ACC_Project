@@ -8,6 +8,8 @@ import com.project.web.Service.SpellChecking;
 import com.project.web.Service.WordCompletion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.*;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 public class ProductController {
@@ -40,17 +44,30 @@ public class ProductController {
 	}
 
 	@PostMapping("/search")
-	public ResponseEntity<Map<String, List<Product>>> searchProduct(@RequestBody RequestSchema product){
-		String spellChecker = spellChecker(product.getProduct());
-		String finalProduct = wordCompletion(product.getProduct());
-		invertedIndexing(finalProduct);
-		calculateWordSearchFrequency(finalProduct);
+	public ResponseEntity searchProduct(@RequestBody RequestSchema product) {
 
-		ResponseEntity<Map<String, List<Product>>> allProducts = productService.getAllProducts(finalProduct);
-		System.out.println("HTTP COde:"+allProducts.getStatusCode());
+		boolean isValid = inputValidation(product.getProduct());
+		if (isValid) {
+			String spellChecker = spellChecker(product.getProduct());
+			String finalProduct = wordCompletion(spellChecker);
+			invertedIndexing(finalProduct);
+			calculateWordSearchFrequency(finalProduct);
+
+			ResponseEntity<Map<String, List<Product>>> allProducts = productService.getAllProducts(finalProduct);
+			System.out.println("HTTP COde:" + allProducts.getStatusCode());
+
 		return allProducts;
 	}
+		return new ResponseEntity<String>("Please input valid text.",HttpStatus.OK);
+	}
 
+	public boolean inputValidation(String product){
+
+		// Regex to remove punctuation
+		String regexToMatch = "^[A-Za-z,'0-9]+";
+		boolean isValid = Pattern.matches(regexToMatch,product.replaceAll("\\s+",""));
+		return isValid;
+	}
 //	@GetMapping("/invertedindexing")
 	public void invertedIndexing(String product){
 
