@@ -149,7 +149,7 @@ public class ProductController {
 		List<String> productCompletions = productTrie.findCompletionsForPrefix(searchPrefix);
 
 		// Check if there are any completions for the provided prefix
-		if (!productCompletions.isEmpty() && !productCompletions.contains(searchPrefix)) {
+		if (!productCompletions.isEmpty()) {
 			productCompletions.add(0,"Continue with "+searchPrefix+" .");
 			System.out.println("Completions for \"" + searchPrefix + "\":");
 			// Iterate over the completions and print each one with an index
@@ -166,9 +166,10 @@ public class ProductController {
 				// User's choice is invalid; print an error message
 				System.out.println("Invalid choice. Exiting.");
 			}
-		}else if(!productCompletions.isEmpty() && productCompletions.contains(searchPrefix)){
-			System.out.println();
 		}
+//		else if(!productCompletions.isEmpty() && productCompletions.contains(searchPrefix)){
+//			System.out.println();
+//		}
 		else {
 			// No completions were found for the provided prefix
 			System.out.println("No completions found for: " + searchPrefix);
