@@ -2,6 +2,9 @@ package com.project.web.scrapper;
 
 import com.project.web.Models.Product;
 import com.project.web.Service.WordFrequencyCounter;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -62,6 +65,7 @@ public class WebCrawler {
             p.setProductRegularPrice(productPrice);
             productList.add(p);
         }
+        createExcelSheet(productList,"amazon_"+searchedItem);
         return productList;
     }
 
@@ -96,7 +100,7 @@ public class WebCrawler {
 
                 productList.add(p);
             }
-
+        createExcelSheet(productList,"visions_"+searchedItem);
         return productList;
 
     }
@@ -159,10 +163,24 @@ public class WebCrawler {
     }
 
     private ChromeOptions setChromeDrivers() {
-        System.setProperty("webdriver.chrome.driver", webDriverPath);
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless");
-        options.addArguments("user-agent="+userAgent);
+        try {
+            File driverFile = new File(webDriverPath);
+            ChromeOptions options = new ChromeOptions();
+
+            if (driverFile.exists()) {
+                System.setProperty("webdriver.chrome.driver", webDriverPath);
+                options.addArguments("--headless");
+                options.addArguments("user-agent=" + userAgent);
+                return options;
+            }
+            else {
+                System.out.println("Chrome driver file doesnot exist on the provided path: " + webDriverPath);
+                return null;
+            }
+        }
+        catch(Exception ex){
+            System.out.println("Exception: Invalid chrome driver");
+        }
         return options;
     }
 
@@ -199,6 +217,7 @@ public class WebCrawler {
             p.setProductRegularPrice(productPrice);
             productList.add(p);
         }
+        createExcelSheet(productList,"bestbuy_"+searchedItem);
         return productList;
     }
 
@@ -249,7 +268,7 @@ public class WebCrawler {
             System.out.println("Successfully wrote to the file.");
         } catch (IOException e) {
             System.out.println("An error occurred.");
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 
@@ -268,9 +287,57 @@ public class WebCrawler {
 
     }
 
+    // Implement page ranking on basis of frequency count
     public void pageRanking(String itemToSearch){
         for(Map.Entry<String,Integer> sortedMap:pageRank.entrySet()){
             System.out.println(sortedMap.getKey()+" contains "+itemToSearch+" "+sortedMap.getValue()+" times.");
+        }
+    }
+
+
+    private void createExcelSheet(List<Product> productList,String fileName) {
+        try
+        {
+            String filename = "C:\\Users\\admin\\Desktop\\git\\ACC_Project\\web\\src\\main\\resources\\Excelsheets\\"+fileName+".xlsx";
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            HSSFSheet sheet = workbook.createSheet("Consumer electronics");
+
+            // create first row to write title
+            HSSFRow rowhead = sheet.createRow((short)0);
+            rowhead.createCell(0).setCellValue("Name");
+            rowhead.createCell(1).setCellValue("Image");
+            rowhead.createCell(2).setCellValue("URL");
+            rowhead.createCell(3).setCellValue("Regular Price");
+            rowhead.createCell(4).setCellValue("Sale Price");
+            rowhead.createCell(5).setCellValue("Ratings");
+            rowhead.createCell(6).setCellValue("Rating Counts");
+
+            // Remaining rows to write data
+            for(int i=0; i < productList.size();i++){
+                HSSFRow row = sheet.createRow((short)(i+1));
+                row.createCell(0).setCellValue(productList.get(i).getProductName());
+                row.createCell(1).setCellValue(productList.get(i).getProductImage());
+                row.createCell(2).setCellValue(productList.get(i).getProductUrl());
+                row.createCell(3).setCellValue(productList.get(i).getProductRegularPrice());
+                row.createCell(4).setCellValue(productList.get(i).getProductSalePrice());
+                row.createCell(5).setCellValue(productList.get(i).getProductRatingStars());
+                row.createCell(6).setCellValue(productList.get(i).getProductRatingCounts());
+            }
+
+            // Write in file
+            FileOutputStream fileOut = new FileOutputStream(filename);
+            workbook.write(fileOut);
+
+            // Closing the objects
+            fileOut.close();
+            workbook.close();
+
+            System.out.println("Excel file has been generated successfully.");
+        }
+        catch (Exception e)
+        {
+//            e.printStackTrace();
+            System.out.println("Exception occurred during excel creation");
         }
     }
 }

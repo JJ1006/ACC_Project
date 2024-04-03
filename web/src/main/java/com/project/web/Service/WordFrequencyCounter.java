@@ -97,7 +97,8 @@ public class WordFrequencyCounter {
             String[] parts = text.split(product.toLowerCase(), -1);
             count = parts.length - 1;
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
+            System.out.println("Exception occured during file reading!");
         }
         return count;
     }

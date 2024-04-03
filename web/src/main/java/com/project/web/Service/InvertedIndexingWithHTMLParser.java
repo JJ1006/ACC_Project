@@ -70,7 +70,7 @@ public class InvertedIndexingWithHTMLParser{
                         String htmlContent = Files.readString(filePath, StandardCharsets.UTF_8);
                         addHTMLDocument(filePath.toString(), htmlContent);
                     } catch (IOException e) {
-                        e.printStackTrace();
+//                        e.printStackTrace();
                         System.err.println("Error reading file: " + filePath);
                     }
                 });
@@ -89,7 +89,8 @@ public class InvertedIndexingWithHTMLParser{
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+//            e.printkTrace();
+            System.out.println("Exception occured during file reading!");
         }
         return count;  // Return the count of files containing the product
 

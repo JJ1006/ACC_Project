@@ -54,7 +54,6 @@ public class ProductController {
 			calculateWordSearchFrequency(finalProduct);
 
 			ResponseEntity<Map<String, List<Product>>> allProducts = productService.getAllProducts(finalProduct);
-			System.out.println("HTTP COde:" + allProducts.getStatusCode());
 
 		return allProducts;
 	}
@@ -140,7 +139,8 @@ public class ProductController {
 		} catch (IOException ioException) {
 			// Print an error message if there was an issue reading the file
 			System.err.println("Error reading from file: " + ioException.getMessage());
-			ioException.printStackTrace();
+
+//			ioException.printStackTrace();
 		}
 
 
@@ -156,7 +156,7 @@ public class ProductController {
 			for (int i = 0; i < productCompletions.size(); i++) {
 				System.out.println((i + 1) + ". " + productCompletions.get(i));
 			}
-			int userChoice = readUserInput();
+			int userChoice = readUserInput(productCompletions.size());
 			// Validate the user's choice and respond accordingly
 			if (userChoice > 0 && userChoice <= productCompletions.size()) {
 				// User's choice is valid; print the selected product
@@ -199,7 +199,7 @@ public class ProductController {
 			for (int i = 0; i < suggestions.size(); i++) {
 				System.out.println((i + 1) + ". " + suggestions.get(i));
 			}
-			int userChoice = readUserInput();
+			int userChoice = readUserInput(suggestions.size());
 
 			// Validate the user's choice and respond accordingly
 			if (userChoice > 0 && userChoice <= suggestions.size()) {
@@ -215,18 +215,21 @@ public class ProductController {
 	}
 
 
-	public int readUserInput(){
+	public int readUserInput(int size){
 		// Prepare to read input from the user
-		Scanner userInputScanner = new Scanner(System.in);
-		// Ask the user to select one of the completions by its index
-		System.out.println("Enter the number of the product you were looking for: ");
 		int userChoice =0 ;
+		Scanner userInputScanner = new Scanner(System.in);
 		try{
-			if(userInputScanner.hasNextInt()) {
-				userChoice = userInputScanner.nextInt();
+			while(userChoice <=0 || userChoice>size){
+				// Ask the user to select one of the completions by its index
+				System.out.println("Enter the number of the product you were looking for (From the given options): ");
+
+				if(userInputScanner.hasNextInt()) {
+					userChoice = userInputScanner.nextInt();
+				}
 			}
 		}catch (Exception e){
-			e.printStackTrace();
+//			e.printStackTrace();
 			System.out.println("Exception while reading input!");
 		}
 		return userChoice;
