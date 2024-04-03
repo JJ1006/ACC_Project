@@ -1,16 +1,17 @@
 package com.project.web.Service;
 
-import org.jsoup.Jsoup;
+
 import org.jsoup.nodes.Document;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import org.jsoup.Jsoup;
+import java.nio.file.Paths;
 @Component
 public class WordFrequencyCounter {
 
@@ -21,19 +22,19 @@ public class WordFrequencyCounter {
     public static int calculateFrequency(String origin, String inputStr, int minStrLength, String product) {
         Map<String, Integer> frequencyCounter = new HashMap<>();
 
-        // Regex to remove punctuation
+        // Punctuation removal via regular expression
         String regexToMatch = "[.,!?;:'']";
 
-        // Pattern object
+        // Instantiated Pattern object
         Pattern patternToMatch = Pattern.compile(regexToMatch);
 
-        // Matcher object
+        // Instantiated Matcher object
         Matcher patternMatcher = patternToMatch.matcher(inputStr);
 
         // remove punctuation
         String output = patternMatcher.replaceAll("");
 
-        // Initialize tokenizer
+        // Instantiated tokenizer
         StringTokenizer tokenizer = new StringTokenizer(output);
 
         // create token and add into the map with frequency

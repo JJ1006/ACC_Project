@@ -1,7 +1,5 @@
 package com.project.web.Models;
 
-import org.antlr.v4.runtime.misc.NotNull;
-
 public class Product {
 
     String productName;
